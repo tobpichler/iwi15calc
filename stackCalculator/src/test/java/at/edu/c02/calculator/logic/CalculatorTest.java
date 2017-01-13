@@ -53,6 +53,19 @@ public class CalculatorTest {
 
 	}
 	
+	
+	@Test
+	public void testSimpleModuOperation() throws Exception {
+
+		Calculator calc = new CalculatorImpl();
+		calc.push(7);
+		calc.push(2);
+		double result = calc.perform(Operation.modulo);
+
+		assertEquals(1, result, 0);
+
+	}
+	
 
 	//
 	@Test(expected = CalculatorException.class)
