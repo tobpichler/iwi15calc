@@ -5,12 +5,17 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.*;
-import javax.xml.stream.events.*;
+import javax.xml.stream.EventFilter;
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.XMLEvent;
 
 import at.edu.c02.calculator.Calculator;
-import at.edu.c02.calculator.CalculatorException;
 import at.edu.c02.calculator.Calculator.Operation;
+import at.edu.c02.calculator.CalculatorException;
 
 public class Parser {
 
@@ -22,16 +27,14 @@ public class Parser {
 		calc_ = cal;
 	}
 
-	public double parse(File calculation) throws FileNotFoundException,
-			XMLStreamException, CalculatorException {
+	public double parse(File calculation) throws FileNotFoundException, XMLStreamException, CalculatorException {
 
 		double result = 0;
 		XMLEventReader r = createXmlEventReader(calculation);
 
 		while (r.hasNext()) {
 			XMLEvent e = r.nextEvent();
-			Attribute attribute = e.asStartElement().getAttributeByName(
-					new QName("value"));
+			Attribute attribute = e.asStartElement().getAttributeByName(new QName("value"));
 			String value = attribute != null ? attribute.getValue() : "";
 			if ("push".equals(e.asStartElement().getName().getLocalPart())) {
 				if ("Result".equalsIgnoreCase(value)) {
@@ -39,11 +42,9 @@ public class Parser {
 				} else {
 					calc_.push(Double.parseDouble(value));
 				}
-			} else if ("pop"
-					.equals(e.asStartElement().getName().getLocalPart())) {
+			} else if ("pop".equals(e.asStartElement().getName().getLocalPart())) {
 				calc_.pop();
-			} else if ("operation".equals(e.asStartElement().getName()
-					.getLocalPart())) {
+			} else if ("operation".equals(e.asStartElement().getName().getLocalPart())) {
 				result = calc_.perform(readOperation(value));
 			}
 		}
@@ -52,8 +53,7 @@ public class Parser {
 	}
 
 	private XMLEventReader createXmlEventReader(File calculation)
-			throws FactoryConfigurationError, FileNotFoundException,
-			XMLStreamException {
+			throws FactoryConfigurationError, FileNotFoundException, XMLStreamException {
 		XMLInputFactory xmlif = XMLInputFactory.newInstance();
 		FileReader fr = new FileReader(calculation);
 		XMLEventReader xmler = xmlif.createXMLEventReader(fr);
@@ -78,7 +78,9 @@ public class Parser {
 			return Operation.div;
 		else if ("-".equals(value))
 			return Operation.sub;
-		
+		else if ("%".equals(value))
+			return Operation.modulo;
+
 		throw new CalculatorException("Unsuppoted Operation");
 	}
 }
