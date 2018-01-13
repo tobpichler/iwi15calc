@@ -28,8 +28,6 @@ public class CalculatorImpl implements Calculator {
 			return c;
 		case mul:
 			return a * b;
-		case modulo:
-			return a % b;
 		}
 		return 0;
 	}
